@@ -33,6 +33,7 @@ boolean MLX90615::begin(void)
  * \li 		Send command 0xC6 to enter sleep mode.
  * \li 		Keep SCL high during sleep mode
  */
+/*
 boolean MLX90615::sleep(void)
 {
 	CRC8 crc(MLX90615_CRC8POLY);
@@ -63,6 +64,7 @@ boolean MLX90615::sleep(void)
 
 	return _sleep = true;
 }
+*/
 
 /*
  * \brief	Wakes up the sensor from sleep mode.
@@ -70,6 +72,7 @@ boolean MLX90615::sleep(void)
  * \li 		Set SCL to LOW for at least t>8ms.
  * \li 		The data will be ready 0.3s after waking up.
  */
+/*
 boolean MLX90615::wakeUp(void)
 {
 	pinMode(A5, OUTPUT);
@@ -80,6 +83,7 @@ boolean MLX90615::wakeUp(void)
 	MLX90615::begin();
 	return _ready;
 }
+*/
 
 /**
  *  \brief             Return a temperature from the specified source in specified units.
