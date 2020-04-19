@@ -23,6 +23,7 @@ MLX90615::MLX90615(uint8_t i2caddr)
  */
 boolean MLX90615::begin(void)
 {
+    Wire.begin();
 	_rwError = _pec = _crc8 = 0;
 	return _ready = true;
 }
@@ -33,7 +34,7 @@ boolean MLX90615::begin(void)
  * \li 		Send command 0xC6 to enter sleep mode.
  * \li 		Keep SCL high during sleep mode
  */
-/*
+
 boolean MLX90615::sleep(void)
 {
 	CRC8 crc(MLX90615_CRC8POLY);
@@ -41,10 +42,10 @@ boolean MLX90615::sleep(void)
     // Build the CRC-8 of all bytes to be sent.
     crc.crc8(_addr << 1);
     _crc8 = crc.crc8(MLX90615_SLEEP_MODE);
-
+/*
     Serial.print("PEC (Sleep Mode) = ");
     Serial.println(_crc8);
-
+*/
     // Send the slave address then the command.
 	Wire.beginTransmission(_addr);
     Wire.write(MLX90615_SLEEP_MODE);
@@ -52,19 +53,17 @@ boolean MLX90615::sleep(void)
     // Then write the crc and set the r/w error status bits.
     Wire.write(_crc8);
     _rwError |= (1 << Wire.endTransmission(true)) >> 1;
-
+ 
     // Now we need to keep SCL high
-    pinMode(A5, OUTPUT);
-    pinMode(A4, OUTPUT);
-    digitalWrite(A5, HIGH);
-    digitalWrite(A4, LOW);
+    // SDA can idle in each state at the same time, but the high state is recommended as the pull-up does not add current drain
+    pinMode(SCL, INPUT);
+    pinMode(SDA, INPUT);
 
     // Clear r/w errors if using broadcast address.
     if(_addr == MLX90615_BROADCASTADDR) _rwError &= MLX90615_NORWERROR;
 
 	return _sleep = true;
 }
-*/
 
 /*
  * \brief	Wakes up the sensor from sleep mode.
@@ -72,18 +71,21 @@ boolean MLX90615::sleep(void)
  * \li 		Set SCL to LOW for at least t>8ms.
  * \li 		The data will be ready 0.3s after waking up.
  */
-/*
+
 boolean MLX90615::wakeUp(void)
 {
-	pinMode(A5, OUTPUT);
-	digitalWrite(A5, LOW);
-	delay(10);
-	Wire.begin();
-	delay(400);
+    // end sleep command
+	pinMode(SCL, OUTPUT);
+	digitalWrite(SCL, LOW);
+	delay(20);
+    digitalWrite(SCL, HIGH);
+   // wait for wake_up and recovery
+	delay(300);
+
 	MLX90615::begin();
 	return _ready;
 }
-*/
+
 
 /**
  *  \brief             Return a temperature from the specified source in specified units.
